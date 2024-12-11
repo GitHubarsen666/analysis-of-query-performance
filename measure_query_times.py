@@ -1,11 +1,11 @@
+from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String, Index
 import time
-from sqlalchemy import create_engine, MetaData, Table, Column, Integer, String
 
 # Конфігурація БД
 DATABASE_URL = "postgresql+pg8000://root:arsen123456!@34.76.108.247:5432/test"
 engine = create_engine(DATABASE_URL)
 
-# Створення таблиці (без індексів)
+# Створення таблиці з індексами
 metadata = MetaData()
 test_table = Table(
     "test_table", metadata,
@@ -14,10 +14,14 @@ test_table = Table(
     Column("value", String)
 )
 
+# Додавання індексів
+Index("idx_name", test_table.c.name)
+Index("idx_value", test_table.c.value)
+
 # Перевірка підключення до БД
 with engine.connect() as connection:
     print("Підключення до бази даних встановлено.")
-    metadata.create_all(engine)  # Створення таблиці
+    metadata.create_all(engine)  # Створення таблиці та індексів
 
 def measure_query_time(query_func, *args, **kwargs):
     """Вимірювання часу виконання запиту."""
@@ -100,5 +104,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
